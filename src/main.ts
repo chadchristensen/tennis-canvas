@@ -23,9 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let ctx = canvas.getContext('2d')!;
 
-    const COURT_WIDTH = CANVAS_WIDTH * .5;
-    const COURT_HEIGHT = CANVAS_HEIGHT * .5;
-
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
