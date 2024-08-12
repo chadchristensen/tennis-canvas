@@ -1,12 +1,11 @@
 import { intersect } from 'mathjs';
 
 document.addEventListener('DOMContentLoaded', function () {
-
-
-  const BACKGROUND_COLOR = '#7046A7';
-  const COURT_COLOR = '#5A9160';
+  // TODO: Get rid of all magic numbers and magic colors
+  const BACKGROUND_COLOR = '#8b5cf6';
+  const COURT_COLOR = '#16a34a';
   const LINE_COLOR = '#ffffff';
-  const BALL_COLOR = '#d5e414';
+  const BALL_COLOR = '#fef08a';
   const POST_COLOR = '#C1A752';
   const BALL_SHADOW_COLOR = '#595e00';
   const NET_COLOR = '#222222';
@@ -15,37 +14,52 @@ document.addEventListener('DOMContentLoaded', function () {
   const CANVAS_WIDTH = window.innerWidth;
   const CANVAS_HEIGHT = window.innerHeight;
 
+  console.log('innerWidth:', window.innerWidth);
+
   let canvas = document.getElementById('tennis-court')!;
 
   if (canvas instanceof HTMLCanvasElement) {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    let leftXPerspective, rightXPerspective, topYHorizon, bottomYHorizon;
+
+    if (CANVAS_WIDTH < 650) {
+      let perspectiveAdjustment = 40;
+      leftXPerspective = -perspectiveAdjustment;
+      rightXPerspective = CANVAS_WIDTH + perspectiveAdjustment;
+      topYHorizon = 250;
+      bottomYHorizon = 500;
+    } else {
+      leftXPerspective = CANVAS_WIDTH * .25;
+      rightXPerspective = CANVAS_WIDTH * .75;
+      topYHorizon = 200;
+      bottomYHorizon = 500;
+    }
+
     let ctx = canvas.getContext('2d')!;
 
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const TOP_HORIZON_Y = 200;
-    const BOTTOM_HORIZON_Y = 500;
 
     const horizontalLinePoints = {
-      leftTopCourt: { x: 20, y: TOP_HORIZON_Y },
-      rightTopCourt: { x: CANVAS_WIDTH - 40, y: TOP_HORIZON_Y },
-      leftBottomCourt: { x: 20, y: BOTTOM_HORIZON_Y },
-      rightBottomCourt: { x: CANVAS_WIDTH - 40, y: BOTTOM_HORIZON_Y },
-      leftTopBaseline: { x: 20, y: TOP_HORIZON_Y + 40 },
-      rightTopBaseline: { x: CANVAS_WIDTH - 40, y: TOP_HORIZON_Y + 40 },
-      leftBottomBaseline: { x: 20, y: BOTTOM_HORIZON_Y - 100 },
-      rightBottomBaseline: { x: CANVAS_WIDTH - 40, y: BOTTOM_HORIZON_Y - 100 },
+      leftTopCourt: { x: 20, y: topYHorizon },
+      rightTopCourt: { x: CANVAS_WIDTH - 40, y: topYHorizon },
+      leftBottomCourt: { x: 20, y: bottomYHorizon },
+      rightBottomCourt: { x: CANVAS_WIDTH - 40, y: bottomYHorizon },
+      leftTopBaseline: { x: 20, y: topYHorizon + 40 },
+      rightTopBaseline: { x: CANVAS_WIDTH - 40, y: topYHorizon + 40 },
+      leftBottomBaseline: { x: 20, y: bottomYHorizon - 100 },
+      rightBottomBaseline: { x: CANVAS_WIDTH - 40, y: bottomYHorizon - 100 },
     }
 
     const verticalLinePoints: { [key: string]: { x: number; y: number; } } = {
       topPerspective: { x: CANVAS_WIDTH * .5, y: -300 },
-      leftCourt: { x: CANVAS_WIDTH * .25, y: CANVAS_HEIGHT - 40 },
-      rightCourt: { x: CANVAS_WIDTH * .75, y: CANVAS_HEIGHT - 40 },
-      leftInnerBaseline: { x: CANVAS_WIDTH * .25 + 125, y: CANVAS_HEIGHT - 40 },
-      rightInnerBaseline: { x: CANVAS_WIDTH * .75 - 125, y: CANVAS_HEIGHT - 40 },
+      leftCourt: { x: leftXPerspective, y: CANVAS_HEIGHT - 40 },
+      rightCourt: { x: rightXPerspective, y: CANVAS_HEIGHT - 40 },
+      leftInnerBaseline: { x: leftXPerspective + 125, y: CANVAS_HEIGHT - 40 },
+      rightInnerBaseline: { x: rightXPerspective - 9 - 125, y: CANVAS_HEIGHT - 40 },
       centerLine: { x: CANVAS_WIDTH * .5, y: CANVAS_HEIGHT - 40 },
     }
 
@@ -159,8 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
       [horizontalLinePoints.rightBottomBaseline.x, horizontalLinePoints.rightBottomBaseline.y]
     );
 
-    // Draw court
-    function drawCountOutline() {
+    function drawCourtOutline() {
       ctx.beginPath();
       ctx.moveTo(Math.floor(topLeftPoint[0] as number), Math.floor(topLeftPoint[1] as number));
       ctx.lineTo(Math.floor(topRightPoint[0] as number), Math.floor(topRightPoint[1] as number));
@@ -247,8 +260,9 @@ document.addEventListener('DOMContentLoaded', function () {
       // * Draw netting
       ctx.fillStyle = NET_COLOR;
       // * Draw vertical lines
+      let verticalLineOffset = CANVAS_WIDTH < 650 ? 30 : 55;
       for (let i = topLeftPoint[0] as number - 5; i < (topRightPoint[0] as number) + 8; i += 6) {
-        ctx.rect(i, topRightPoint[1] as number + 55, 1, 60);
+        ctx.rect(i, topRightPoint[1] as number + verticalLineOffset, 1, 60);
         ctx.fill();
       }
 
@@ -279,10 +293,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    const [tennisBallX, tennisBallY] = generateRandomTennisBallCoordinates();
-
-
     function drawTennisBall() {
+      const [tennisBallX, tennisBallY] = generateRandomTennisBallCoordinates();
       // * Draw tennis ball shadow
       ctx.beginPath();
       ctx.ellipse(tennisBallX + 2, tennisBallY + 6, 6, 3, Math.floor(Math.random() * 10), 0, 2 * Math.PI);
@@ -298,12 +310,13 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.fill();
     }
 
-    ctx.rect(bottomLeftPoint[0] as number - 4, bottomLeftPoint[1] as number + 2, (bottomRightPoint[0] as number) - (bottomLeftPoint[0] as number) + 7, 10);
-    ctx.fillStyle = '#C2C2C2';
-    ctx.fill();
+    function drawBorderDepth() {
+      ctx.rect(bottomLeftPoint[0] as number - 4, bottomLeftPoint[1] as number + 2, (bottomRightPoint[0] as number) - (bottomLeftPoint[0] as number) + 7, 10);
+      ctx.fillStyle = '#C2C2C2';
+      ctx.fill();
+    }
 
-
-    drawCountOutline();
+    drawCourtOutline();
     drawInnerCourtLines();
     drawCenterLine();
     drawLeftBaseline();
@@ -312,70 +325,8 @@ document.addEventListener('DOMContentLoaded', function () {
     drawPost(topRightPoint[0] as number - 10, topRightPoint[1] as number, 20, 25);
     drawTennisBall();
     drawNet();
-
-
-
-
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(innerTopLeftPoint[0] as number), Math.floor(innerTopLeftPoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(innerTopRightPoint[0] as number), Math.floor(innerTopRightPoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(innerBottomRightPoint[0] as number), Math.floor(innerBottomRightPoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(innerBottomLeftPoint[0] as number), Math.floor(innerBottomLeftPoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(topLeftBaselinePoint[0] as number), Math.floor(topLeftBaselinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // Draw Baseline points
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(topLeftBaselinePoint[0] as number), Math.floor(topLeftBaselinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(bottomLeftBaselinePoint[0] as number), Math.floor(bottomLeftBaselinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(topRightBaselinePoint[0] as number), Math.floor(topRightBaselinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(bottomRightBaselinePoint[0] as number), Math.floor(bottomRightBaselinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // Draw Centerline Points
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(topCenterLinePoint[0] as number), Math.floor(topCenterLinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
-    // ctx.beginPath();
-    // ctx.arc(Math.floor(bottomCenterLinePoint[0] as number), Math.floor(bottomCenterLinePoint[1] as number), 4, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
-
+    drawBorderDepth();
   } else {
-
+    console.error('Canvas element not found');
   }
 });
