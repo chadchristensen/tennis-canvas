@@ -1,11 +1,12 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  font-family: Poppins, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #ffffffde;
+  background-color: #8b5cf6;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,10 +14,50 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+}
+
+h1 {
+  margin-bottom: .025em;
+}
+
+.subheading {
+  font-weight: bolder;
+}
+
+a {
+  display: inline-flex;
+  align-items: center;
+  margin: .5em .25em;
+}
+
+svg {
+  height: 1.25em;
+  width: 1.25em;
+  fill: #ffffffde;
+  transition: 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+svg:hover {
+  transform: scale(1.25);
+}
+
+.svg-transparent {
+  fill: #8b5cf6;
 }
