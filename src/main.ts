@@ -19,22 +19,22 @@ document.addEventListener('DOMContentLoaded', function () {
   let canvas = document.getElementById('tennis-court')!;
 
   if (canvas instanceof HTMLCanvasElement) {
-    canvas.width = CANVAS_WIDTH;
+    canvas.width = CANVAS_WIDTH - 15;
     canvas.height = CANVAS_HEIGHT;
 
     let leftXPerspective, rightXPerspective, topYHorizon, bottomYHorizon;
 
     if (CANVAS_WIDTH < 650) {
-      let perspectiveAdjustment = 40;
+      let perspectiveAdjustment = 150;
       leftXPerspective = -perspectiveAdjustment;
       rightXPerspective = CANVAS_WIDTH + perspectiveAdjustment;
-      topYHorizon = 250;
-      bottomYHorizon = 500;
+      topYHorizon = 100;
+      bottomYHorizon = topYHorizon + 250;
     } else {
       leftXPerspective = CANVAS_WIDTH * .25;
       rightXPerspective = CANVAS_WIDTH * .75;
-      topYHorizon = 200;
-      bottomYHorizon = 500;
+      topYHorizon = 150;
+      bottomYHorizon = topYHorizon + 250;
     }
 
     let ctx = canvas.getContext('2d')!;
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // * Draw netting
       ctx.fillStyle = NET_COLOR;
       // * Draw vertical lines
-      let verticalLineOffset = CANVAS_WIDTH < 650 ? 30 : 55;
+      let verticalLineOffset = 30;
       for (let i = topLeftPoint[0] as number - 5; i < (topRightPoint[0] as number) + 8; i += 6) {
         ctx.rect(i, topRightPoint[1] as number + verticalLineOffset, 1, 60);
         ctx.fill();
